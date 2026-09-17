@@ -23,6 +23,30 @@ cp .env.example .env
 npm run dev
 ```
 
+## Run with Docker
+
+Requirements: Docker Desktop with Docker Compose.
+
+```bash
+cp .env.example .env
+# Set HF_TOKEN in .env for the embedding endpoint.
+docker compose -f infra/docker/docker-compose.yml up -d --build
+docker compose -f infra/docker/docker-compose.yml ps
+```
+
+The API is available at `http://localhost:4000`, PostgreSQL at `localhost:5432`,
+and Redis at `localhost:6379`. Containers communicate over the Compose network
+using the service names `postgres` and `redis`.
+
+Stop the stack with:
+
+```bash
+docker compose -f infra/docker/docker-compose.yml down
+```
+
+Add `-v` to the `down` command only when you also want to delete the PostgreSQL
+data volume.
+
 The first slice establishes the project boundaries. Product features will be added incrementally.
 
 The API health check is available at `GET /api/v1/health`.
