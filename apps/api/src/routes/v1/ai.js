@@ -1,6 +1,7 @@
 import express from "express";
 import { askOllama } from "../../ai/llm/ollama.js";
 import { createEmbedding } from "../../ai/embeddings/huggingface.js";
+import { db, embeddings } from "../../db/index.js";
 
 export const aiRouter = express.Router();
 
@@ -28,8 +29,18 @@ aiRouter.get("/embedding-test", async (req, res) => {
       "GitHub authentication using OAuth"
     );
 
-    res.json({
+    const [storedEmbedding] = await db.insert(embeddings).values({
+      text: "GitHub authentication using OAuth",
       embedding
+    }).returning({
+      id: embeddings.id,
+      text: embeddings.text,
+      createdAt: embeddings.createdAt
+    });
+
+    res.json({
+      embedding,
+      stored: storedEmbedding
     });
   } catch (error) {
     console.error(error);

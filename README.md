@@ -34,6 +34,21 @@ docker compose -f infra/docker/docker-compose.yml up -d --build
 docker compose -f infra/docker/docker-compose.yml ps
 ```
 
+The Postgres service uses `pgvector/pgvector:pg17`. On a fresh Docker volume,
+the migration in `apps/api/drizzle` automatically enables the `vector`
+extension and creates `embeddings.embedding` as `vector(384)`. To apply the
+same setup to an existing database, run:
+
+```bash
+docker compose -f infra/docker/docker-compose.yml exec -T postgres \
+	psql -U postgres -d devpilot \
+	-c 'CREATE EXTENSION IF NOT EXISTS vector;' \
+	-c 'CREATE TABLE IF NOT EXISTS embeddings (id serial PRIMARY KEY, text text NOT NULL, embedding vector(384) NOT NULL, created_at timestamp DEFAULT now() NOT NULL);'
+```
+
+Calling `GET /api/v1/ai/embedding-test` generates a 384-dimensional embedding
+and stores it in PostgreSQL.
+
 The API is available at `http://localhost:4000`, PostgreSQL at `localhost:5432`,
 and Redis at `localhost:6379`. Containers communicate over the Compose network
 using the service names `postgres` and `redis`.
