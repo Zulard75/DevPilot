@@ -1,0 +1,20 @@
+{
+  "name": "@devpilot/db",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "db:check": "tsx src/client/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "mongoose": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/pg": "^8.23.1"
+  }
+}

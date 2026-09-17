@@ -1,0 +1,28 @@
+{
+  "name": "devpilot",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@devpilot/web",
+    "dev:api": "npm run dev --workspace=@devpilot/api",
+    "dev:worker": "npm run dev --workspace=@devpilot/worker",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:check": "npm run db:check --workspace=@devpilot/db"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "drizzle-orm": "^1.0.0-rc.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "drizzle-kit": "^1.0.0-rc.4",
+    "tailwindcss": "^4.3.3"
+  }
+}

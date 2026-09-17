@@ -1,0 +1,22 @@
+{
+  "name": "@devpilot/api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file=.env --watch src/server.js",
+    "start": "node --env-file=.env src/server.js",
+    "check": "node --check src/server.js",
+    "db:push": "drizzle-kit push --config drizzle.config.js",
+    "db:generate": "drizzle-kit generate --config drizzle.config.js",
+    "db:migrate": "drizzle-kit migrate --config drizzle.config.js",
+    "db:studio": "drizzle-kit studio --config drizzle.config.js"
+  },
+  "dependencies": {
+    "@huggingface/inference": "^4.13.30",
+    "cookie-parser": "latest",
+    "express": "latest",
+    "ollama": "^0.6.3",
+    "pg": "latest"
+  }
+}

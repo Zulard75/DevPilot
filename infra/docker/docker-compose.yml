@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:17.4
+    container_name: devpilot-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: devpilot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d devpilot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - devpilot-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: devpilot-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - devpilot-network
+
+  api:
+    build:
+      context: ../../apps/api
+    container_name: devpilot-api
+    env_file:
+      - path: ../../apps/api/.env
+        required: false
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/devpilot
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - devpilot-network
+
+volumes:
+  postgres_data:
+
+networks:
+  devpilot-network:
+    driver: bridge
