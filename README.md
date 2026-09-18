@@ -46,8 +46,8 @@ docker compose -f infra/docker/docker-compose.yml exec -T postgres \
 	-c 'CREATE TABLE IF NOT EXISTS embeddings (id serial PRIMARY KEY, text text NOT NULL, embedding vector(384) NOT NULL, created_at timestamp DEFAULT now() NOT NULL);'
 ```
 
-Calling `GET /api/v1/ai/embedding-test` generates a 384-dimensional embedding
-and stores it in PostgreSQL.
+Calling `GET /api/v1/ai/embedding-test?chunkId=1` generates a 384-dimensional
+embedding and stores it in PostgreSQL linked to the requested chunk.
 
 The API is available at `http://localhost:4000`, PostgreSQL at `localhost:5432`,
 and Redis at `localhost:6379`. Containers communicate over the Compose network

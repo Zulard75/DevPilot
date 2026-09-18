@@ -13,3 +13,4 @@ export * from './schema/conversations.js';
 export * from './schema/messages.js';
 export * from './schema/agent-runs.js';
 export * from './schema/sessions.js';
+export * from './schema/github-accounts.js';

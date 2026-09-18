@@ -3,13 +3,12 @@ import {
   serial,
   integer,
   varchar,
-  text,
   timestamp
 } from "drizzle-orm/pg-core";
 
 import { users } from "./users.js";
 
-export const repositories = pgTable("repositories", {
+export const githubAccounts = pgTable("github_accounts", {
   id: serial("id").primaryKey(),
 
   userId: integer("user_id")
@@ -18,21 +17,13 @@ export const repositories = pgTable("repositories", {
       onDelete: "cascade"
     }),
 
-  githubId: integer("github_id").notNull().unique(),
+  githubId: varchar("github_id", {
+    length: 50
+  }).notNull().unique(),
 
-  name: varchar("name", {
-    length: 255
-  }).notNull(),
-
-  fullName: varchar("full_name", {
+  accessToken: varchar("access_token", {
     length: 500
   }).notNull(),
-
-  url: text("url"),
-
-  defaultBranch: varchar("default_branch", {
-    length: 255
-  }),
 
   createdAt: timestamp("created_at")
     .defaultNow()

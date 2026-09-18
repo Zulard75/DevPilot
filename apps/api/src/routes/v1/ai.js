@@ -24,17 +24,25 @@ aiRouter.get("/test", async (req, res) => {
 });
 
 aiRouter.get("/embedding-test", async (req, res) => {
+  const chunkId = Number(req.query.chunkId);
+
+  if (!Number.isInteger(chunkId) || chunkId < 1) {
+    return res.status(400).json({
+      message: "chunkId query parameter is required to store an embedding"
+    });
+  }
+
   try {
     const embedding = await createEmbedding(
       "GitHub authentication using OAuth"
     );
 
     const [storedEmbedding] = await db.insert(embeddings).values({
-      text: "GitHub authentication using OAuth",
+      chunkId,
       embedding
     }).returning({
       id: embeddings.id,
-      text: embeddings.text,
+      chunkId: embeddings.chunkId,
       createdAt: embeddings.createdAt
     });
 
