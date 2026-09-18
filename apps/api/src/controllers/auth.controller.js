@@ -9,6 +9,7 @@ import {
   findUserByGithubId,
   createUser
 } from "../repositories/user.repository.js";
+import { createGithubAccount } from "../repositories/github-account.repository.js";
 import { createSession } from "../repositories/session.repository.js";
 
 export const githubLogin = (req, res) => {
@@ -55,6 +56,12 @@ export const githubCallback = async (req, res) => {
     if (!user) {
       user = await createUser(githubUser);
     }
+
+    await createGithubAccount({
+      userId: user.id,
+      githubId: String(githubUser.id),
+      accessToken: tokenData.access_token
+    });
 
     const session = await createSession(user.id);
 
