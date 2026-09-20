@@ -15,10 +15,19 @@ export const createGithubAccount = async ({
       githubId,
       accessToken
     })
+    .onConflictDoUpdate({
+      target: githubAccounts.githubId,
+      set: {
+        userId,
+        accessToken
+      }
+    })
     .returning();
 
   return account;
 };
+
+
 
 export const findGithubAccountByUserId = async (userId) => {
   const [account] = await db
