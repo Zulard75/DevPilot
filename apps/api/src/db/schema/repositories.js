@@ -34,6 +34,8 @@ export const repositories = pgTable("repositories", {
     length: 255
   }),
 
+  localPath: text("local_path"),
+
   createdAt: timestamp("created_at")
     .defaultNow()
     .notNull()

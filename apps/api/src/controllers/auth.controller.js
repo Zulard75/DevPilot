@@ -32,7 +32,13 @@ export const githubLogin = (req, res) => {
 
 
 export const githubCallback = async (req, res) => {
-  const { code, state } = req.query;
+  const { code, state, error, error_description: errorDescription } = req.query;
+
+  if (error) {
+    return res.status(400).json({
+      message: errorDescription || `GitHub authorization failed: ${error}`
+    });
+  }
 
   if (!code || !state) {
     return res.status(400).json({

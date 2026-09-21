@@ -16,10 +16,12 @@
     "@huggingface/inference": "^4.13.30",
     "cookie-parser": "latest",
     "cors": "^2.8.6",
+    "diff": "^9.0.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^1.0.0-rc.4",
     "express": "latest",
     "ollama": "^0.6.3",
-    "pg": "latest"
+    "pg": "latest",
+    "simple-git": "^3.36.0"
   }
 }
