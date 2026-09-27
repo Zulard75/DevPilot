@@ -1,0 +1,390 @@
+{
+  "info": {
+    "name": "DevPilot API",
+    "_postman_id": "devpilot-api-collection-v1",
+    "description": "Complete collection for DevPilot AI Developer Assistant backend with authentication, GitHub integration, vector RAG search, and human-in-the-loop agent workflows.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "7ac2b1833105ae48be93d47333e16532315fbc0147ab3c235543b5f015a91ba2",
+      "type": "string"
+    },
+    {
+      "key": "repositoryId",
+      "value": "2",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "1. Health & Info",
+      "item": [
+        {
+          "name": "Health Check (v1)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/health", "host": ["{{baseUrl}}"], "path": ["api", "v1", "health"] }
+          }
+        },
+        {
+          "name": "Health Check (Root alias)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+          }
+        },
+        {
+          "name": "Root Service Info",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/", "host": ["{{baseUrl}}"], "path": [""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "Dev Login (Quick Auth for Postman)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.sessionToken) {",
+                  "    pm.collectionVariables.set('token', json.sessionToken);",
+                  "    console.log('Updated collection token variable to:', json.sessionToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 2\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/dev-login", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "dev-login"] },
+            "description": "Logs in as userId (e.g. 2 for Zulard75) or creates a dev user and automatically updates the Postman {{token}} collection variable."
+          }
+        },
+        {
+          "name": "Get Auth Session (/auth/me)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/me", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "me"] }
+          }
+        },
+        {
+          "name": "Logout (/auth/logout)",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Users",
+      "item": [
+        {
+          "name": "Get Current User Profile (/users/me)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/users/me", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "me"] }
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/users/2", "host": ["{{baseUrl}}"], "path": ["api", "v1", "users", "2"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. GitHub & Repositories",
+      "item": [
+        {
+          "name": "Connect GitHub Token (Postman Direct Link)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accessToken\": \"ghp_your_github_personal_access_token\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/github/connect", "host": ["{{baseUrl}}"], "path": ["api", "v1", "github", "connect"] }
+          }
+        },
+        {
+          "name": "Sync & List GitHub Repositories",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/github/repositories", "host": ["{{baseUrl}}"], "path": ["api", "v1", "github", "repositories"] }
+          }
+        },
+        {
+          "name": "Get Repository File Tree",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/github/repositories/{{repositoryId}}/files", "host": ["{{baseUrl}}"], "path": ["api", "v1", "github", "repositories", "{{repositoryId}}", "files"] }
+          }
+        },
+        {
+          "name": "Ingest Repository (Chunks & Embeddings)",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/v1/github/repositories/{{repositoryId}}/ingest", "host": ["{{baseUrl}}"], "path": ["api", "v1", "github", "repositories", "{{repositoryId}}", "ingest"] }
+          }
+        },
+        {
+          "name": "Clone Repository Locally for Agent",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/v1/github/repositories/{{repositoryId}}/clone", "host": ["{{baseUrl}}"], "path": ["api", "v1", "github", "repositories", "{{repositoryId}}", "clone"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Projects & Documents",
+      "item": [
+        {
+          "name": "List Projects",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/projects", "host": ["{{baseUrl}}"], "path": ["api", "v1", "projects"] }
+          }
+        },
+        {
+          "name": "Get Project By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/projects/{{repositoryId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "projects", "{{repositoryId}}"] }
+          }
+        },
+        {
+          "name": "List Indexed Documents",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documents?repositoryId={{repositoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documents"],
+              "query": [
+                { "key": "repositoryId", "value": "{{repositoryId}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Document Content By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/documents/2", "host": ["{{baseUrl}}"], "path": ["api", "v1", "documents", "2"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. AI, Search & Chat (RAG)",
+      "item": [
+        {
+          "name": "Ollama LLM Test (/ai/test)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/ai/test", "host": ["{{baseUrl}}"], "path": ["api", "v1", "ai", "test"] }
+          }
+        },
+        {
+          "name": "Generate Vector Embedding (/ai/embedding)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Database connection and Drizzle ORM schemas\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/ai/embedding", "host": ["{{baseUrl}}"], "path": ["api", "v1", "ai", "embedding"] }
+          }
+        },
+        {
+          "name": "Semantic Vector Search (/ai/search)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/ai/search?q=auth%20middleware&repositoryId={{repositoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "ai", "search"],
+              "query": [
+                { "key": "q", "value": "auth middleware" },
+                { "key": "repositoryId", "value": "{{repositoryId}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Chat with Codebase (/chat - POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"How does authentication and session verification work?\",\n  \"repositoryId\": {{repositoryId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/chat", "host": ["{{baseUrl}}"], "path": ["api", "v1", "chat"] }
+          }
+        },
+        {
+          "name": "Chat with Codebase (/chat - GET)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/chat?q=How%20does%20database%20connection%20work&repositoryId={{repositoryId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "chat"],
+              "query": [
+                { "key": "q", "value": "How does database connection work" },
+                { "key": "repositoryId", "value": "{{repositoryId}}" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Agent Workflows & Approval",
+      "item": [
+        {
+          "name": "Run Agent Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Where is the authentication middleware defined and how does it validate cookies?\",\n  \"repositoryId\": {{repositoryId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/run", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "run"] }
+          }
+        },
+        {
+          "name": "List Agent Runs",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/runs", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "runs"] }
+          }
+        },
+        {
+          "name": "Get Agent Run By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/runs/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "runs", "1"] }
+          }
+        },
+        {
+          "name": "List Proposed Changes",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/changes?repositoryId={{repositoryId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "changes"], "query": [{ "key": "repositoryId", "value": "{{repositoryId}}" }] }
+          }
+        },
+        {
+          "name": "Get Change Diff By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/changes/1", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "changes", "1"] }
+          }
+        },
+        {
+          "name": "Approve Proposed Change",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/changes/1/approve", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "changes", "1", "approve"] }
+          }
+        },
+        {
+          "name": "Reject Proposed Change",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/changes/1/reject", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "changes", "1", "reject"] }
+          }
+        },
+        {
+          "name": "Apply Approved Change to Local Clone",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/changes/1/apply", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "changes", "1", "apply"] }
+          }
+        },
+        {
+          "name": "Create Git Branch for Agent Run",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/runs/1/branch", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "runs", "1", "branch"] }
+          }
+        },
+        {
+          "name": "Get Git Diff for Agent Run",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/runs/1/git-diff", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "runs", "1", "git-diff"] }
+          }
+        },
+        {
+          "name": "Commit Agent Changes to Git",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"feat: apply verified agent improvements\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/runs/1/commit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "runs", "1", "commit"] }
+          }
+        }
+      ]
+    }
+  ]
+}

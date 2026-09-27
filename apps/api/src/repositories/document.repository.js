@@ -39,3 +39,37 @@ export const updateDocument = async (documentId, content) => {
 
 	return document;
 };
+
+export const findDocumentById = async (documentId) => {
+	const [document] = await db
+		.select()
+		.from(documents)
+		.where(eq(documents.id, Number(documentId)))
+		.limit(1);
+
+	return document || null;
+};
+
+export const listDocumentsByRepository = async (repositoryId) => {
+	return db
+		.select({
+			id: documents.id,
+			repositoryId: documents.repositoryId,
+			path: documents.path,
+			createdAt: documents.createdAt
+		})
+		.from(documents)
+		.where(eq(documents.repositoryId, Number(repositoryId)));
+};
+
+export const listAllDocuments = async (limit = 100) => {
+	return db
+		.select({
+			id: documents.id,
+			repositoryId: documents.repositoryId,
+			path: documents.path,
+			createdAt: documents.createdAt
+		})
+		.from(documents)
+		.limit(limit);
+};

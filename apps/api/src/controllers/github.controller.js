@@ -2,13 +2,55 @@ import { eq } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { repositories } from "../db/schema/repositories.js";
-import { findGithubAccountByUserId } from "../repositories/github-account.repository.js";
+import {
+  findGithubAccountByUserId,
+  createGithubAccount
+} from "../repositories/github-account.repository.js";
 import { createRepository } from "../repositories/repository.repository.js";
 import { getGithubRepositories } from "../services/github/repository.service.js";
 import { ingestRepository } from "../services/github/ingestion.service.js";
 import { getGithubRepositoryFiles } from "../services/github/file.service.js";
+import { getGithubUser } from "../services/auth/auth.service.js";
 
-export const connectGithub = (_request, response) => response.status(501).json({ error: 'GitHub controller not implemented yet' });
+export const connectGithub = async (req, res) => {
+	try {
+		const { accessToken } = req.body || {};
+
+		if (!accessToken) {
+			return res.status(400).json({
+				message: "accessToken is required to connect GitHub"
+			});
+		}
+
+		const githubUser = await getGithubUser(accessToken);
+
+		const account = await createGithubAccount({
+			userId: req.user.id,
+			githubId: String(githubUser.id),
+			accessToken
+		});
+
+		res.json({
+			message: "GitHub account connected successfully",
+			account: {
+				id: account.id,
+				githubId: account.githubId
+			},
+			githubUser: {
+				id: githubUser.id,
+				login: githubUser.login,
+				name: githubUser.name,
+				avatarUrl: githubUser.avatar_url
+			}
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({
+			message: "Failed to connect GitHub account",
+			error: error.message
+		});
+	}
+};
 
 export const getRepositories = async (req, res) => {
 	try {

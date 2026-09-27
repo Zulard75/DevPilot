@@ -4,7 +4,9 @@ export const getGithubRepositories = async (accessToken) => {
     {
       headers: {
         Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`,
+        "User-Agent": "DevPilot-App",
+        "X-GitHub-Api-Version": "2022-11-28"
       }
     }
   );

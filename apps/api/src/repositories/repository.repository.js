@@ -62,3 +62,16 @@ export const updateRepositoryPath = async (repositoryId, localPath) => {
 
   return repository;
 };
+
+export const listRepositoriesByUser = async (userId) => {
+  return db
+    .select()
+    .from(repositories)
+    .where(eq(repositories.userId, userId));
+};
+
+export const listAllRepositories = async () => {
+  return db
+    .select()
+    .from(repositories);
+};

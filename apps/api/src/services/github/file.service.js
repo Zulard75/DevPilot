@@ -9,7 +9,9 @@ export const getGithubRepositoryFiles = async (
     {
       headers: {
         Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`,
+        "User-Agent": "DevPilot-App",
+        "X-GitHub-Api-Version": "2022-11-28"
       }
     }
   );
@@ -32,7 +34,9 @@ export const getGithubFileContent = async (
     {
       headers: {
         Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${accessToken}`,
+        "User-Agent": "DevPilot-App",
+        "X-GitHub-Api-Version": "2022-11-28"
       }
     }
   );

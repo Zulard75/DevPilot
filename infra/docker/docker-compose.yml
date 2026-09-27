@@ -9,7 +9,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ../../apps/api/drizzle/20260917193000_add_pgvector_embeddings/migration.sql:/docker-entrypoint-initdb.d/001_embeddings.sql:ro
+      - ../../apps/api/drizzle/20260916191105_silly_the_order/migration.sql:/docker-entrypoint-initdb.d/001_users.sql:ro
+      - ../../apps/api/drizzle/20260917193000_add_pgvector_embeddings/migration.sql:/docker-entrypoint-initdb.d/002_embeddings.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d devpilot"]
       interval: 5s

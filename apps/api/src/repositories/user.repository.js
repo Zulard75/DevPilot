@@ -25,3 +25,40 @@ export const createUser = async (githubUser) => {
 
   return result[0];
 };
+
+export const findUserById = async (id) => {
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, Number(id)))
+    .limit(1);
+
+  return result[0] || null;
+};
+
+export const findUserByUsername = async (username) => {
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.username, username))
+    .limit(1);
+
+  return result[0] || null;
+};
+
+export const findOrCreateDevUser = async ({ username = "dev-user", email = "dev@example.com" } = {}) => {
+  const devGithubId = "dev-9999";
+  let user = await findUserByGithubId(devGithubId);
+
+  if (!user) {
+    user = await createUser({
+      id: devGithubId,
+      login: username,
+      name: "Dev Pilot User",
+      email,
+      avatar_url: "https://avatars.githubusercontent.com/u/9999"
+    });
+  }
+
+  return user;
+};

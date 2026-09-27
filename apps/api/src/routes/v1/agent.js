@@ -3,6 +3,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { requireAuth } from "../../middleware/auth.js";
 import { db } from "../../db/index.js";
 import { agentRuns } from "../../db/schema/agent-runs.js";
+import { fileChanges } from "../../db/schema/file-changes.js";
 import { runAgent } from "../../agent/agent.js";
 import { findRepositoryByUser } from "../../repositories/repository.repository.js";
 import {
@@ -79,6 +80,75 @@ agentRouter.get(
 
 			res.status(500).json({
 				message: "Failed to fetch agent runs"
+			});
+		}
+	}
+);
+
+agentRouter.get(
+	"/runs/:runId",
+	requireAuth,
+	async (req, res) => {
+		try {
+			const runId = Number(req.params.runId);
+			const [run] = await db
+				.select()
+				.from(agentRuns)
+				.where(
+					and(
+						eq(agentRuns.id, runId),
+						eq(agentRuns.userId, req.user.id)
+					)
+				)
+				.limit(1);
+
+			if (!run) {
+				return res.status(404).json({
+					message: "Agent run not found"
+				});
+			}
+
+			res.json({ run });
+		} catch (error) {
+			console.error(error);
+			res.status(500).json({
+				message: "Failed to fetch agent run"
+			});
+		}
+	}
+);
+
+agentRouter.get(
+	"/changes",
+	requireAuth,
+	async (req, res) => {
+		try {
+			const repositoryId = req.query.repositoryId ? Number(req.query.repositoryId) : null;
+			let query = db
+				.select()
+				.from(fileChanges)
+				.where(eq(fileChanges.userId, req.user.id))
+				.orderBy(desc(fileChanges.createdAt));
+
+			if (repositoryId) {
+				query = db
+					.select()
+					.from(fileChanges)
+					.where(
+						and(
+							eq(fileChanges.userId, req.user.id),
+							eq(fileChanges.repositoryId, repositoryId)
+						)
+					)
+					.orderBy(desc(fileChanges.createdAt));
+			}
+
+			const changes = await query;
+			res.json({ changes });
+		} catch (error) {
+			console.error(error);
+			res.status(500).json({
+				message: "Failed to fetch changes"
 			});
 		}
 	}

@@ -3,7 +3,8 @@ import { requireAuth } from "../../middleware/auth.js";
 import {
 	getRepositories,
 	ingestGithubRepository,
-	getGithubRepositoryFilesController
+	getGithubRepositoryFilesController,
+	connectGithub
 } from "../../controllers/github.controller.js";
 import { cloneRepository } from "../../services/git/clone.service.js";
 import { getRepositoryPath } from "../../services/git/path.service.js";
@@ -14,6 +15,12 @@ import {
 import { findGithubAccountByUserId } from "../../repositories/github-account.repository.js";
 
 export const githubRouter = express.Router();
+
+githubRouter.post(
+	"/connect",
+	requireAuth,
+	connectGithub
+);
 
 githubRouter.get(
 	"/repositories",

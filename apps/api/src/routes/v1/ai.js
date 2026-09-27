@@ -134,4 +134,62 @@ aiRouter.get("/chat", requireAuth, async (req, res) => {
   }
 });
 
+aiRouter.post("/chat", requireAuth, async (req, res) => {
+  try {
+    const question = req.body.question || req.body.q;
+    const repositoryId = Number(req.body.repositoryId);
+
+    if (!question || !Number.isInteger(repositoryId)) {
+      return res.status(400).json({
+        message: "question and repositoryId are required"
+      });
+    }
+
+    const repository = await findRepositoryByUser(
+      repositoryId,
+      req.user.id
+    );
+
+    if (!repository) {
+      return res.status(403).json({
+        message: "You do not have access to this repository"
+      });
+    }
+
+    const result = await askCodebase(question, repository.id);
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "RAG request failed",
+      error: error.message
+    });
+  }
+});
+
+aiRouter.post("/embedding", async (req, res) => {
+  const { text } = req.body || {};
+
+  if (!text || typeof text !== "string") {
+    return res.status(400).json({
+      message: "text string field is required in request body"
+    });
+  }
+
+  try {
+    const embedding = await createEmbedding(text);
+    res.json({
+      text,
+      dimensions: embedding.length,
+      embedding
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Embedding generation failed",
+      error: error.message
+    });
+  }
+});
+
 export default aiRouter;

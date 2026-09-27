@@ -50,7 +50,8 @@ export const getGithubUser = async (accessToken) => {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: `Bearer ${accessToken}`,
-      "X-GitHub-Api-Version": "2026-03-10"
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "DevPilot-App"
     }
   });
 

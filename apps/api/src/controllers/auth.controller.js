@@ -7,7 +7,10 @@ import {
 
 import {
   findUserByGithubId,
-  createUser
+  findUserById,
+  findUserByUsername,
+  createUser,
+  findOrCreateDevUser
 } from "../repositories/user.repository.js";
 import { createGithubAccount } from "../repositories/github-account.repository.js";
 import { createSession } from "../repositories/session.repository.js";
@@ -89,4 +92,47 @@ export const githubCallback = async (req, res) => {
       message: "GitHub authentication failed"
     });
   }
+};
+
+export const devLogin = async (req, res) => {
+  try {
+    const { username, userId, email = "dev@example.com" } = req.body || {};
+    let user;
+
+    if (userId) {
+      user = await findUserById(Number(userId));
+    } else if (username) {
+      user = await findUserByUsername(username);
+    }
+
+    if (!user) {
+      user = await findOrCreateDevUser({ username: username || "Zulard75", email });
+    }
+
+    const session = await createSession(user.id);
+
+    res.cookie("session_token", session.sessionToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.json({
+      message: "Development authentication successful",
+      sessionToken: session.sessionToken,
+      user
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Development login failed",
+      error: error.message
+    });
+  }
+};
+
+export const logout = async (_req, res) => {
+  res.clearCookie("session_token");
+  res.json({ message: "Logged out successfully" });
 };

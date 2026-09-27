@@ -2,7 +2,13 @@ import pg from 'pg';
 import { env } from './env.js';
 
 const { Pool } = pg;
-const databaseUrl = new URL(env.databaseUrl);
+const rawUrl = env.databaseUrl || 'postgresql://postgres:password@localhost:5432/devpilot';
+let databaseUrl;
+try {
+  databaseUrl = new URL(rawUrl);
+} catch {
+  databaseUrl = new URL('postgresql://postgres:password@localhost:5432/devpilot');
+}
 
 export const pool = new Pool({
   host: databaseUrl.hostname,
