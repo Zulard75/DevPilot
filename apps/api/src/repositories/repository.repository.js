@@ -83,3 +83,34 @@ export const listAllRepositories = async () => {
     .select()
     .from(repositories);
 };
+
+export const createProject = async ({ userId, name, fullName, url, defaultBranch = "main" }) => {
+  const generatedGithubId = Math.floor(100000000 + Math.random() * 900000000);
+  const [project] = await db
+    .insert(repositories)
+    .values({
+      userId,
+      githubId: generatedGithubId,
+      name,
+      fullName: fullName || name,
+      url: url || `https://github.com/devpilot/${name}`,
+      defaultBranch
+    })
+    .returning();
+
+  return project;
+};
+
+export const deleteProject = async (projectId, userId) => {
+  const conditions = [eq(repositories.id, Number(projectId))];
+  if (userId) {
+    conditions.push(eq(repositories.userId, Number(userId)));
+  }
+
+  const [deleted] = await db
+    .delete(repositories)
+    .where(and(...conditions))
+    .returning();
+
+  return deleted || null;
+};

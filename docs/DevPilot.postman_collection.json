@@ -189,10 +189,45 @@
           }
         },
         {
+          "name": "Create Project (Dynamic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"my-new-microservice\",\n  \"fullName\": \"Zulard75/my-new-microservice\",\n  \"url\": \"https://github.com/Zulard75/my-new-microservice\",\n  \"defaultBranch\": \"main\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/projects", "host": ["{{baseUrl}}"], "path": ["api", "v1", "projects"] }
+          }
+        },
+        {
           "name": "Get Project By ID",
           "request": {
             "method": "GET",
             "url": { "raw": "{{baseUrl}}/api/v1/projects/{{repositoryId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "projects", "{{repositoryId}}"] }
+          }
+        },
+        {
+          "name": "Delete Project By ID",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/v1/projects/{{repositoryId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "projects", "{{repositoryId}}"] }
+          }
+        },
+        {
+          "name": "Create Document & Index into pgvector (Dynamic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"repositoryId\": {{repositoryId}},\n  \"path\": \"src/services/payment.service.js\",\n  \"content\": \"export const processPayment = (amount) => { console.log('Processing payment of', amount); return { success: true, txnId: 'tx_123' }; };\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/v1/documents", "host": ["{{baseUrl}}"], "path": ["api", "v1", "documents"] }
           }
         },
         {

@@ -23,5 +23,19 @@ const request = async (path: string, options: RequestInit = {}) => {
 
 export const api = {
   health: async () => request('/health'),
+  getCurrentUser: async () => request('/users/me'),
+  getProjects: async () => request('/projects'),
+  createProject: async (name: string) => request('/projects', {
+    method: 'POST',
+    body: JSON.stringify({ name })
+  }),
+  getDocuments: async (repositoryId?: number) =>
+    request(`/documents${repositoryId ? `?repositoryId=${repositoryId}` : ''}`),
+  getDocumentById: async (id: number) => request(`/documents/${id}`),
+  chat: async (question: string, repositoryId: number) =>
+    request('/chat', {
+      method: 'POST',
+      body: JSON.stringify({ question, repositoryId })
+    }),
   getGithubRepositories: async () => request('/github/repositories')
 };
