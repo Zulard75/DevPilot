@@ -7,9 +7,13 @@ import {
 export const listProjects = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const projects = userId
+    let projects = userId
       ? await listRepositoriesByUser(userId)
-      : await listAllRepositories();
+      : [];
+
+    if (!projects || projects.length === 0) {
+      projects = await listAllRepositories();
+    }
 
     res.json({ projects });
   } catch (error) {

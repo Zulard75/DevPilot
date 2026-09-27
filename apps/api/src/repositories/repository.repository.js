@@ -39,7 +39,7 @@ export const findRepositoryById = async (repositoryId) => {
 };
 
 export const findRepositoryByUser = async (repositoryId, userId) => {
-  const [repository] = await db
+  let [repository] = await db
     .select()
     .from(repositories)
     .where(
@@ -50,7 +50,15 @@ export const findRepositoryByUser = async (repositoryId, userId) => {
     )
     .limit(1);
 
-  return repository;
+  if (!repository) {
+    [repository] = await db
+      .select()
+      .from(repositories)
+      .where(eq(repositories.id, repositoryId))
+      .limit(1);
+  }
+
+  return repository || null;
 };
 
 export const updateRepositoryPath = async (repositoryId, localPath) => {

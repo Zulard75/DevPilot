@@ -7,9 +7,13 @@ import {
 export const listDocuments = async (req, res) => {
   try {
     const repositoryId = req.query.repositoryId ? Number(req.query.repositoryId) : null;
-    const documents = repositoryId
+    let documents = repositoryId
       ? await listDocumentsByRepository(repositoryId)
       : await listAllDocuments();
+
+    if (repositoryId && (!documents || documents.length === 0)) {
+      documents = await listAllDocuments();
+    }
 
     res.json({ documents });
   } catch (error) {
