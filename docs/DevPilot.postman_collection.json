@@ -418,6 +418,13 @@
             },
             "url": { "raw": "{{baseUrl}}/api/v1/agent/runs/1/commit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "runs", "1", "commit"] }
           }
+        },
+        {
+          "name": "Push Agent Branch to GitHub",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/v1/agent/runs/1/push", "host": ["{{baseUrl}}"], "path": ["api", "v1", "agent", "runs", "1", "push"] }
+          }
         }
       ]
     }

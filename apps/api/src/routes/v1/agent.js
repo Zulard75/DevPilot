@@ -14,7 +14,8 @@ import { applyChange } from "../../services/agent/apply-change.service.js";
 import {
 	prepareAgentBranch,
 	getAgentDiff,
-	commitAgentChanges
+	commitAgentChanges,
+	pushAgentChanges
 } from "../../services/git/agent-git.service.js";
 
 export const agentRouter = Router();
@@ -471,6 +472,62 @@ agentRouter.post(
 
 			res.status(500).json({
 				message: "Failed to commit changes"
+			});
+		}
+	}
+);
+
+agentRouter.post(
+	"/runs/:runId/push",
+	requireAuth,
+	async (req, res) => {
+		try {
+			const runId = Number(req.params.runId);
+			const [run] = await db
+				.select()
+				.from(agentRuns)
+				.where(
+					and(
+						eq(agentRuns.id, runId),
+						eq(agentRuns.userId, req.user.id)
+					)
+				)
+				.limit(1);
+
+			if (!run) {
+				return res.status(404).json({
+					message: "Agent run not found"
+				});
+			}
+
+			const repository = await findRepositoryByUser(
+				run.repositoryId,
+				req.user.id
+			);
+
+			if (!repository?.localPath) {
+				return res.status(400).json({
+					message: "Repository is not cloned"
+				});
+			}
+
+			const branchName = `devpilot/agent-${runId}`;
+			const pushResult = await pushAgentChanges({
+				repositoryPath: repository.localPath,
+				branchName
+			});
+
+			res.json({
+				message: `Pushed branch ${branchName} to GitHub successfully`,
+				branch: branchName,
+				pushResult
+			});
+		} catch (error) {
+			console.error(error);
+
+			res.status(500).json({
+				message: "Failed to push agent changes to GitHub",
+				error: error.message
 			});
 		}
 	}

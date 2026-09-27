@@ -2,7 +2,8 @@ import {
   createBranch,
   getDiff,
   stageAll,
-  commitChanges
+  commitChanges,
+  pushBranch
 } from "./git.service.js";
 
 export const prepareAgentBranch = async ({ repositoryPath, runId }) => {
@@ -18,4 +19,8 @@ export const getAgentDiff = async (repositoryPath) => {
 export const commitAgentChanges = async ({ repositoryPath, message }) => {
   await stageAll(repositoryPath);
   return commitChanges(repositoryPath, message);
+};
+
+export const pushAgentChanges = async ({ repositoryPath, branchName }) => {
+  return pushBranch(repositoryPath, branchName);
 };

@@ -28,3 +28,8 @@ export const getCurrentBranch = async (repositoryPath) => {
   const result = await git.branchLocal();
   return result.current;
 };
+
+export const pushBranch = async (repositoryPath, branchName, remote = "origin") => {
+  const git = createGit(repositoryPath);
+  return git.push(remote, branchName, ["--set-upstream"]);
+};
